@@ -12,7 +12,6 @@ https://github.com/servocoder/RichFilemanager
 
 ### How do I get set up? ###
 
-* cd flaskfilemanager/flaskfilemanager/
 * source flaskfilemanagerenv/bin/activate
 * export FLASK_APP=FlaskApp.py
 * python3 -m flask run
