@@ -15,3 +15,4 @@ https://github.com/servocoder/RichFilemanager
 * source flaskfilemanagerenv/bin/activate
 * export FLASK_APP=FlaskApp.py
 * python3 -m flask run
+* Open your browser and go to http://localhost:5000/files/filemanager
