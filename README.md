@@ -2,7 +2,8 @@
 
 ### A Flask sample application for Rich Filemanager ###
 This is a functional implementation of Rich Filemanager using Python3 and Flask for the server side connector. This application is intended to be used as an example and not for production. The author is not responsible for any damages that may result from use.
-https://github.com/servocoder/RichFilemanager
+
+Rich Filemanager is an open-source file manager. See https://github.com/servocoder/RichFilemanager
 
 ### Dependencies ###
 * Python3
