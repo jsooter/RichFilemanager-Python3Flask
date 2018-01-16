@@ -10,6 +10,7 @@ Based on the @simogeo [Filemanager](https://github.com/simogeo/Filemanager), wit
 * Multiple actions support for selected files & folders: move, delete, download
 * Before and After callback functions for some actions
 * Double or single click setup to open files & folders
+* Lazy loading of images thumbnails
 * Integration with AWS S3 storage
 * Integration with Imperavi Redactor WYSIWYG editor
 * Multiple & chunked uploads support - based on jQuery-File-Upload
@@ -40,9 +41,9 @@ Filemanager live example: http://fm.devale.pro
 Compatibility
 -------------
 
-Filemanager was initially designed to interact with a number of programming languages via [connectors](https://github.com/servocoder/RichFilemanager/tree/master/connectors).
-But since many changes have been done recently, **PHP, Java & ASHX connectors** are the only actual connectors currently. Compatibility with other connectors is most likely completely broken.
-You are still able you to download unsupported v0.8 from [archive](https://github.com/simogeo/Filemanager/archive/v0.8.zip) (PHP, ASHX, ASP, CFM, lasso, PL and JSP)
+Filemanager is designed to interact with a number of programming languages via [connectors](https://github.com/servocoder/RichFilemanager/tree/master/connectors).
+The actual connectors are: **PHP, Java, ASHX, ASP, NodeJs & Python 3 Flask**.
+You are still able you to download unsupported v0.8 from [archive](https://github.com/simogeo/Filemanager/archive/v0.8.zip) (CFM, lasso, PL, JSP and Python WSGI)
 
 Browser compatibility:
 
@@ -88,7 +89,7 @@ Main features
 * Online text / code edition - based on [codeMirror](http://codemirror.net/)
 * Online PDF & OpenOffice documents viewer - based on [viewerJS](http://viewerjs.org/)
 * Online MS Office documents viewer - based on [Google Docs Viewer](http://docs.google.com/viewer/)
-* Several server-side language connectors available. **PHP, Java & ASHX are up-to-date**
+* Several server-side language connectors available. **PHP, Java, ASHX, ASP, NodeJs & Python 3 Flask up-to-date**
 * Standardized API that follows JSON API best practices to create connectors for any server-side language
 * Independent client and server sides. Can be located on different servers.
 * [Opening a given folder](https://github.com/servocoder/RichFilemanager/wiki/How-to-open-a-given-folder-different-from-root-folder-when-opening-the-filemanager)

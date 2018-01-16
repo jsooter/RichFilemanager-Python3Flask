@@ -11,7 +11,8 @@
 // error_reporting(E_ERROR | E_WARNING | E_PARSE | E_NOTICE);
 // ini_set('display_errors', '1');
 
-require 'vendor/autoload.php';
+require_once 'vendor/autoload.php';
+require_once __DIR__ . '/events.php';
 
 // fix display non-latin chars correctly
 // https://github.com/servocoder/RichFilemanager/issues/7
@@ -32,14 +33,15 @@ if(!ini_get('date.timezone')) {
 // This function only authorizes the user to connect and/or load the initial page.
 // Authorization for individual files or dirs is provided by the two functions below.
 //
-// NOTE: If this function returns false, the user will simply see an error. It
-// probably makes more sense to redirect the user to a login page instead.
-//
 // NOTE: If using session variables, the session must be started first (session_start()).
 function fm_authenticate()
 {
     // Customize this code as desired.
     return true;
+
+    // If this function returns false, the user will just see an error.
+    // If this function returns an array with "redirect" key, the user will be redirected to the specified URL:
+    // return ['redirect' => 'http://domain.my/login'];
 }
 
 
@@ -102,6 +104,9 @@ $config = [];
 //];
 
 $app = new \RFM\Application();
+
+// uncomment to use events
+//$app->registerEventsListeners();
 
 $local = new \RFM\Repository\Local\Storage($config);
 
