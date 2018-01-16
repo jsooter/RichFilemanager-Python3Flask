@@ -48,8 +48,10 @@ class FileManagerResponse(object):
         attributes['path']          = self.path
         attributes['readable']      = 1 if os.access(self.path, os.R_OK) else 0
         attributes['writable']      = 1 if os.access(self.path, os.W_OK) else 0
-        attributes['created']       = datetime.datetime.fromtimestamp(self.statinfo.st_ctime).ctime()
-        attributes['modified']      = datetime.datetime.fromtimestamp(self.statinfo.st_mtime).ctime()
+        #attributes['created']       = datetime.datetime.fromtimestamp(self.statinfo.st_ctime).ctime()
+        #attributes['modified']      = datetime.datetime.fromtimestamp(self.statinfo.st_mtime).ctime()
+        attributes['created']     = int(self.statinfo.st_ctime)
+        attributes['modified']     = int(self.statinfo.st_mtime)
         attributes['timestamp']     = int(self.statinfo.st_mtime)
         if self.content:
             attributes['content']   = self.content

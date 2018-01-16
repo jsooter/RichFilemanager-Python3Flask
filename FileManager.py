@@ -38,7 +38,7 @@ class FileManager:
         response['data']                = data
         return jsonify(response)
 #===============================================================================
-    def getfile(self):
+    def readfile(self):
         ''' Provides data for a single file. '''
         file        = request.args.get('path').lstrip("/")
         path        = os.path.join(self.root,file)
@@ -48,7 +48,7 @@ class FileManager:
         response.set_response()
         return jsonify(response.response)
 #===============================================================================
-    def getfolder(self):
+    def readfolder(self):
         ''' Provides list of file and folder objects contained in a given directory. '''
         folder          = request.args.get('path').lstrip("/")
         folder_path     = os.path.join(self.root,folder)
