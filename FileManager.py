@@ -9,9 +9,20 @@ from flask import request, jsonify, send_file
 from werkzeug.utils import secure_filename
 from .FileManagerResponse import *
 
+
+
 class FileManager:
     # Path to your files root
     root = os.path.join(os.path.dirname(os.path.abspath(__file__)),'files')
+    def fileManagerError(self,title='FORBIDDEN_CHAR_SLASH'):
+       return self.error(title)
+    def is_safe_path(self,path, follow_symlinks=True):
+       basedir = self.root
+       # resolves symbolic links
+       if follow_symlinks:
+           return os.path.realpath(path).startswith(basedir)
+       return os.path.abspath(path).startswith(basedir)
+
     def initiate(self):
         ''' Initial request to connector.
         Intended to provide the application with safe server-side data, such as shared
@@ -42,36 +53,45 @@ class FileManager:
         ''' Provides data for a single file. '''
         file        = request.args.get('path').lstrip("/")
         path        = os.path.join(self.root,file)
-        with open(path, "r") as fh:
-            content = fh.read()
-        response    = FileManagerResponse(path)
-        response.set_response()
-        return jsonify(response.response)
+        if (self.is_safe_path(path)):
+           with open(path, "r") as fh:
+               content = fh.read()
+           response    = FileManagerResponse(path)
+           response.set_response()
+           return jsonify(response.response)
+        else:
+           return self.fileManagerError()
 #===============================================================================
     def readfolder(self):
         ''' Provides list of file and folder objects contained in a given directory. '''
         folder          = request.args.get('path').lstrip("/")
         folder_path     = os.path.join(self.root,folder)
         data            = []
-        for file in os.listdir(folder_path):
-            path        = os.path.join(folder_path,file)
-            response    = FileManagerResponse(path)
-            response.set_data()
-            data.append(response.data)
-        results         = {}
-        results['data'] = data
-        return jsonify(results)
+        if (self.is_safe_path(folder_path)):
+           for file in os.listdir(folder_path):
+               path        = os.path.join(folder_path,file)
+               response    = FileManagerResponse(path)
+               response.set_data()
+               data.append(response.data)
+           results         = {}
+           results['data'] = data
+           return jsonify(results)
+        else:
+           return self.fileManagerError()
 #===============================================================================
     def addfolder(self):
         ''' Creates a new directory on the server within the given path. '''
         path        = request.args.get('path').lstrip("/")
         name        = request.args.get('name')
         folder_path = os.path.join(self.root,path,name)
-        if not os.path.exists(folder_path):
-            os.makedirs(folder_path)
-        response    = FileManagerResponse(folder_path)
-        response.set_response()
-        return jsonify(response.response)
+        if (self.is_safe_path(path)):
+           if not os.path.exists(folder_path):
+               os.makedirs(folder_path)
+           response    = FileManagerResponse(folder_path)
+           response.set_response()
+           return jsonify(response.response)
+        else:
+           return self.fileManagerError()
 #===============================================================================
     def upload(self):
         ''' Uploads a new file to the given folder.
@@ -85,12 +105,15 @@ class FileManager:
             if file.filename != '':
                 filename  = secure_filename(file.filename)
                 file_path = os.path.join(self.root,path,filename)
-                file.save(file_path)
-                response  = FileManagerResponse(file_path)
-                response.set_response()
-                return jsonify(response.response)
+                if (self.is_safe_path(file_path)):
+                   file.save(file_path)
+                   response  = FileManagerResponse(file_path)
+                   response.set_response()
+                   return jsonify(response.response)
+                else:
+                   return self.fileManagerError()
         # if upload failed return error
-        return fileManagerError()
+        return self.fileManagerError()
 #===============================================================================
     def rename(self):
         ''' Renames an existed file or folder. '''
@@ -103,10 +126,19 @@ class FileManager:
         # New name for the file/folder after the renaming. e.g. "icon.png"
         new      = request.args.get('new')
         new_path = os.path.join(self.root,path,new)
-        os.rename(old_path, new_path)
-        response = FileManagerResponse(new_path)
-        response.set_response()
-        return jsonify(response.response)
+        if filename:
+           look = new_path
+        else:
+           oldname = parts.pop()
+           path     = '/'.join(parts)
+           new_path = os.path.join(self.root,path,new)
+        if (self.is_safe_path(new_path)):
+           os.rename(old_path, new_path)
+           response = FileManagerResponse(new_path)
+           response.set_response()
+           return jsonify(response.response)
+        else:
+           return self.fileManagerError()
 #===============================================================================
     def move(self):
         ''' Moves file or folder to specified directory. '''
@@ -119,10 +151,17 @@ class FileManager:
         # New relative path for the file/folder after the move. e.g. "/images/target/"
         new      = request.args.get('new').lstrip("/")
         new_path = os.path.join(self.root,new,filename)
-        os.rename(old_path, new_path)
-        response = FileManagerResponse(new_path)
-        response.set_response()
-        return jsonify(response.response)
+        if (self.is_safe_path(new_path)):
+           shutil.move(old_path,new_path)
+           if filename:
+              look = new_path
+           else:
+              look = new_path+'/'+parts[len(parts)-1]
+           response = FileManagerResponse(look)
+           response.set_response()
+           return jsonify(response.response)
+        else:
+           return self.fileManagerError()
 #===============================================================================
     def copy(self):
         ''' Copies file or folder to specified directory. '''
@@ -135,10 +174,13 @@ class FileManager:
         # New relative path for the file/folder after the move. e.g. "/images/target/"
         new      = request.args.get('new').lstrip("/")
         new_path = os.path.join(self.root,new,filename)
-        shutil.copyfile(old_path, new_path)
-        response = FileManagerResponse(new_path)
-        response.set_response()
-        return jsonify(response.response)
+        if (self.is_safe_path(new_path)):
+           shutil.copyfile(old_path, new_path)
+           response = FileManagerResponse(new_path)
+           response.set_response()
+           return jsonify(response.response)
+        else:
+           return self.fileManagerError()
 #===============================================================================
     def editfile(self):
         ''' Edit a specific file contents online (extensions are specified in configuration file).
@@ -146,24 +188,30 @@ class FileManager:
         All special characters in the file contents should be converted to HTML entities. '''
         file        = request.args.get('path').lstrip("/")
         path        = os.path.join(self.root,file)
-        with open(path, "r") as fh:
-            content = fh.read()
-        response    = FileManagerResponse(path)
-        response.set_content(content)
-        response.set_response()
-        return jsonify(response.response)
+        if (self.is_safe_path(path)):
+           with open(path, "r") as fh:
+               content = fh.read()
+           response    = FileManagerResponse(path)
+           response.set_content(content)
+           response.set_response()
+           return jsonify(response.response)
+        else:
+           return self.fileManagerError()
 #===============================================================================
     def savefile(self):
         ''' Overwrites the content of the specific file to the "content" request parameter value. '''
         file    = request.form.get('path').lstrip("/")
         content = request.form.get('content')
         path    = os.path.join(self.root,file)
-        if os.path.isfile(path):
-            with open(path, "w") as fh:
-                fh.write(content)
-        response = FileManagerResponse(path)
-        response.set_response()
-        return jsonify(response.response)
+        if (self.is_safe_path(path)):
+           if os.path.isfile(path):
+               with open(path, "w") as fh:
+                   fh.write(content)
+           response = FileManagerResponse(path)
+           response.set_response()
+           return jsonify(response.response)
+        else:
+           return self.fileManagerError()
 #===============================================================================
     def delete(self):
         ''' Deletes an existed file or folder. '''
@@ -171,11 +219,14 @@ class FileManager:
         path    = os.path.join(self.root,file)
         response = FileManagerResponse(path)
         response.set_response()
-        if os.path.isdir(path):
-            shutil.rmtree(path)
-        elif os.path.isfile(path):
-            os.remove(path)
-        return jsonify(response.response)
+        if (self.is_safe_path(path)):
+           if os.path.isdir(path):
+               shutil.rmtree(path)
+           elif os.path.isfile(path):
+               os.remove(path)
+           return jsonify(response.response)
+        else:
+           return self.fileManagerError()
 #===============================================================================
     def download(self):
         ''' Downloads requested file or folder.
@@ -197,17 +248,23 @@ class FileManager:
             response.set_response()
             return jsonify(response.response)
         else:
-            return send_file(path,
+           if (self.is_safe_path(path)):
+              return send_file(path,
                          mimetype=mimetype,
                          attachment_filename=filename,
                          as_attachment=True)
+           else:
+              return self.fileManagerError()
 #===============================================================================
     def getimage(self):
         ''' Outputs the content of image file to browser. '''
         file      = request.args.get('path').lstrip("/")
         path      = os.path.join(self.root,file)
         mime_type, encoding = mimetypes.guess_type(path)
-        return send_file(path, mimetype=mime_type)
+        if (self.is_safe_path(path)):
+           return send_file(path, mimetype=mime_type)
+        else:
+           return self.fileManagerError()
 #===============================================================================
     def readfile(self):
         ''' Outputs the content of requested file to browser. Intended to read
@@ -218,10 +275,13 @@ class FileManager:
         mimetype, encoding = MimeTypes().guess_type(path)
         parts = file.split('/')
         filename = parts.pop()
-        return send_file(path,
+        if (self.is_safe_path(path)):
+           return send_file(path,
                      mimetype=mimetype,
                      attachment_filename=filename,
                      as_attachment=True)
+        else:
+           return self.fileManagerError()
 #===============================================================================
     def summarize(self):
         ''' Display user storage folder summarize info. '''
@@ -248,26 +308,29 @@ class FileManager:
         source_path     = os.path.join(self.root,source)
         target          = request.form.get('target').lstrip("/")
         target_path     = os.path.join(self.root,target)
-        with ZipFile(source_path,"r") as zip_ref:
-            zip_ref.extractall(target_path)
-        data            = []
-        for file in os.listdir(target_path):
-            path        = os.path.join(target_path,file)
-            response    = FileManagerResponse(path)
-            response.set_data()
-            data.append(response.data)
-        results         = {}
-        results['data'] = data
-        return jsonify(results)
+        if (self.is_safe_path(source_path) and self.is_safe_path(target_path)):
+           with ZipFile(source_path,"r") as zip_ref:
+               zip_ref.extractall(target_path)
+           data            = []
+           for file in os.listdir(target_path):
+               path        = os.path.join(target_path,file)
+               response    = FileManagerResponse(path)
+               response.set_data()
+               data.append(response.data)
+           results         = {}
+           results['data'] = data
+           return jsonify(results)
+        else:
+           return self.fileManagerError()
 #===============================================================================
-    def error(self):
+    def error(self,title='Server Error. Unexpected Mode.'):
         '''  '''
         result           = {}
         errors           = []
         error            = {}
         error['id']      = 'server'
         error['code']    = '500'
-        error['title']   = 'Server Error. Unexpected Mode.'
+        error['title']   = title
         errors.append(error)
         result['errors'] = errors
         return jsonify(result)
