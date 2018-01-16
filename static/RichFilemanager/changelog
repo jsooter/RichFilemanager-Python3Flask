@@ -1,3 +1,123 @@
+Version 2.7.0
+---------------------------
+- server-side search implemented, relative to the open folder #271
+- implemented client-side datetime formatting using globalizejs and cldrjs #227
+- added "createFolder" capability in JSON config file (affects appropriate UI elements visibility) #227
+- adjusted language codes and UI lang files names #227
+- added new translations into language files #269 #271
+- changed behavior of the "close" button of preview mode; made it more straightforward, respecting search mode
+- PHP connector: implemented events and listeners (as callback functions) for API operations #236 servocoder/RichFilemanager#24
+- PHP connector: throw an error if delete operation failed servocoder/RichFilemanager#29
+- PHP connector: allow double underscores in file names servocoder/RichFilemanager#28
+- PHP connector: automatically exclude image thumbnails folder from the output servocoder/RichFilemanager#27
+- PHP connector: avoid spaces and parentheses inserted into a file name while upload #112 servocoder/RichFilemanager#26
+- PHP connector: use a single point to calculate filesize across application servocoder/RichFilemanager#25
+- JAVA connector: actualized to the latest API version and support all features; moved to separate repository
+- bugfix: fixed missed "home" breadcrumbs icon on after RFM initiated
+- bugfix: PHP connector local storage always return "false" when deleting file servocoder/RichFilemanager#29
+
+Backward incompatible changes:
+- API: error response format altered to correspond to JSON API standard #210 servocoder/RichFilemanager#30
+- API: new error handling flow; required HTTP headers; strict JSON API conformity #270 servocoder/RichFilemanager#33
+- API: simplified workflow of the "download" method, doesn't require AJAX API extra call anymore #248 #265 servocoder/RichFilemanager#32
+- API: "getfile" API method RENAMED to "getinfo" and return either file or folder stats. Restriction to handle files only is removed #270
+- API: "getfolder" API method RENAMED to "readfolder". No changes in functionality #270
+- API: "readfile", "getimage" and "download" methods USE THE SAME FLOW to read file content and write it to the output #270
+- API: "editfile" method is REMOVED, instead of it the "readfile" is used at the client #270
+- API: "seekfolder" new method is ADDED #271 servocoder/RichFilemanager#34
+- API file and folder object response structure: removed "timestamp" attribute; "created" and "modified" attributes now contain unix timestamps instead of formatted datetime strings #227
+- "options.searchBox" configuration option is removed, new section "search" added instead #271
+
+
+Version 2.6.5
+---------------------------
+- tightened dependencies between "richfilemanager-php" and main packages #268
+- JAVA connector: replaced "title" with "message" in error response format #231
+- bugfix: broken modal window in CKEditor integration when open "table" tool #263
+- Vietnamese language: updated translations #267
+- Czech language: updated translations
+
+
+Version 2.6.4
+---------------------------
+- reworked folder loader for filetree and right panel #255
+- implemented "beforeSetRequestParams" and "beforeSendRequest" callback functions #260
+- bugfix: should close folder in right panel upon delete its ancestor n filetree #261
+- added template for GitHub issues
+- better file renderers support
+
+
+Version 2.6.3
+---------------------------
+- improvement: direct upload upon simple file uploads #247
+- bugfix: when delete opened folder from filetree the right panel should switch to the parent folder #252
+- Spanish language: updated translations #253
+
+
+Version 2.6.2
+---------------------------
+- implemented progress bar for batch operations #249
+- bugfix: type filters do not work with the list view #225 #228
+- Java connector: added file type check before uploading files #245
+- Chinese (Taiwan) language: updated translations #240
+- Persian (Farsi) language: added lang file #250 #251
+- Arabic language: complete rewrite #230
+- Portuguese language: updated translations
+
+
+Version 2.6.1 (Hotfix)
+---------------------------
+- better compression with uglifyJs
+- bugfix: broken references in the minified RFM script
+- bugfix: no images previews in the grid/list when using filters along with images lazyLoad feature
+
+
+Version 2.6.0
+---------------------------
+- implemented language switcher with page reload #171
+- implemented client-side filtering with UI buttons #204
+- added predefined filters in the config file for client-side filtering, thanks @Saso222 #205
+- updated NodeJs connector: new response format, support for most API methods, thanks @forestlake #209
+- updates and customizations for LazyLoad plugin to support IE9 & IE10 #214
+- added refresh folder items / item preview UI button #215
+- clipboard UI buttons are disabled when no actions are available #220
+- rearranged header UI buttons
+- updated DE translations
+- updated ZN-CN translations, thanks @toolgood #208
+- bugfix: wrong URL docs.google.com viewer, thanks @abnerjacobsen #213
+- bugfix: Lazy Loading for thumbs doesn't work for new/moved/copied images #214
+- bugfix: selected files are not taken properly when using the copy button in the toolbar #219
+
+Backward incompatible changes:
+- "options.culture" configuration option is moved to "language.default" option
+- "options.defaultViewMode" configuration option is moved to "manager.defaultView" option
+- removed obsolete "showFullPath" and "localizeGUI" configuration options #216
+- removed "flat-oil" and "flat-turquoise" themes
+
+
+Version 2.5.1
+---------------------------
+- added capability to pass parameters to the connector, thanks @Saso222 #132
+- lazyload images thumbnails in the right panel, thanks @gmkll #148
+- updated JSP connector, compatible with v2.5.x, thanks @gmkll #195
+- bugfix: mouse scrolling doesn't work for default browser scroll
+
+
+Version 2.5.0
+---------------------------
+- Asp.Net Core connector support, thanks @sinanbozkus #163;
+- Python 3 Flask connector support, thanks @jsooter #164;
+- added redirect functionality if initial authorization fails #183;
+- added possibility to copy URLs without flash (Zeroclipboard replaced with clipboard.js library) #150;
+- added new `clipboard`.`encodeCopyUrl` configuration option #191;
+- fixed "initiate" method of ASHX connector #194;
+- updated Italian translations #183;
+- updated Czech translations;
+
+Backward incompatible changes:
+- `clipboard` configuration option was moved out of `options` section and became a separate section;
+
+
 Version 2.4.0
 ---------------------------
 - New backend security model #111;

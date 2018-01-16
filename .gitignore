@@ -99,3 +99,8 @@ ENV/
 
 # mypy
 .mypy_cache/
+.DS_Store
+.idea
+composer.lock
+/userfiles
+/node_modules

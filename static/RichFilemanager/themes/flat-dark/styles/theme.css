@@ -42,27 +42,39 @@
     border-bottom: 1px dotted #efefef;
 }
 
-.fm-container button {
+.fm-container .button-group .btn {
     color: #333;
     background-color: #E8E8E8;
-    padding: 0.2em 0.3em;
     border: 1px solid #fff;
     -moz-border-radius: 2px;
     -webkit-border-radius: 2px;
     border-radius: 2px;
 }
 
-.fm-container button:hover {
+.fm-container .button-group .separator {
+    padding: 3px 1px;
+    background-color: #E8E8E8;
+}
+
+.fm-container .fm-header .button-group .btn {
+    padding: 5px 3px;
+}
+
+.fm-container .fm-header .button-group select.btn {
+    padding: 4px 2px;
+}
+
+.fm-container .button-group .btn:not(.disabled):hover {
     background-color: #C3D2F7;
 }
 
-.fm-container #filepath {
-    -webkit-border-top-left-radius: 2px;
-    -webkit-border-bottom-left-radius: 2px;
-    -moz-border-radius-topleft: 2px;
-    -moz-border-radius-bottomleft: 2px;
-    border-top-left-radius: 2px;
-    border-bottom-left-radius: 2px;
+.fm-container .input-group .input-group-input {
+    color: #000;
+    background-color: #E8E8E8;
+}
+
+.fm-container .input-group .input-group-addon {
+    background-color: #E8E8E8;
 }
 
 .fm-container #folder-info {
@@ -75,17 +87,6 @@
 
 .fm-container #link-to-project {
     background: transparent url(../images/fmlogo.png) no-repeat 0 0;
-}
-
-.fm-container .search-box input {
-    background-color: #3F3F3B;
-    -webkit-border-radius: 2px;
-    -moz-border-radius: 2px;
-    border-radius: 2px;
-}
-
-.fm-container .search-box input:focus {
-    background-color: #C6C6C6;
 }
 
 .fm-container .view-items .grid li {

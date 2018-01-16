@@ -3,3 +3,5 @@
 composer.lock
 /userfiles
 /node_modules
+/config/filemanager.config.json
+/config/filemanager.init.js

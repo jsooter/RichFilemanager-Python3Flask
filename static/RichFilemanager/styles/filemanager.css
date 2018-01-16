@@ -1,5 +1,8 @@
 /**
-* Icons are from http://icomoon.io/app/
+* Icons are from:
+* http://icomoon.io/app/
+* http://www.iconarchive.com/show/ios7-icons-by-icons8.html
+* http://www.iconarchive.com/show/windows-8-icons-by-icons8.html
 **/
 
 html, body {
@@ -10,20 +13,6 @@ html, body {
 html[data-useragent*='MSIE 10.0'] .fm-container .fm-header button,
 html[data-useragent*='MSIE 11.0'] .fm-container .fm-header button {
     vertical-align: top;
-}
-html[data-useragent*='MSIE 10.0'] .fm-container #file-input-container,
-html[data-useragent*='MSIE 11.0'] .fm-container #file-input-container {
-    width: 220px;
-    height: 32px;
-    overflow: hidden;
-}
-html[data-useragent*='MSIE 10.0'] .fm-container #filepath,
-html[data-useragent*='MSIE 11.0'] .fm-container #filepath {
-    height: 22px;
-}
-html[data-useragent*='MSIE 10.0'] .fm-container #newfile,
-html[data-useragent*='MSIE 11.0'] .fm-container #newfile {
-    height: 23px;
 }
 
 .fm-container * {
@@ -40,6 +29,19 @@ html[data-useragent*='MSIE 11.0'] .fm-container #newfile {
     overflow: hidden;
 }
 
+.fm-container input {
+    vertical-align: text-top;
+}
+
+.fm-container .hidden-file-input {
+    position: absolute;
+    overflow: hidden;
+    visibility: hidden;
+    left: -1000px;
+    width: 1px;
+    z-index: -1;
+}
+
 .fm-container .fm-wrapper {
     height: 100%;
     padding: 10px;
@@ -51,6 +53,10 @@ html[data-useragent*='MSIE 11.0'] .fm-container #newfile {
     height: auto;
     min-height: 30px;
     overflow: hidden;
+}
+
+.fm-container .clickable {
+    cursor: pointer;
 }
 
 .fm-container .fm-header .breadcrumbs {
@@ -82,8 +88,18 @@ html[data-useragent*='MSIE 11.0'] .fm-container #newfile {
 .fm-container .fm-header .breadcrumbs .nav-item.root {
     width: 20px;
     height: 20px;
-    background-image: url(../images/house.png);
+    background-image: url(../images/nav/grey/home.png);
     background-size: 20px;
+}
+
+.fm-container .button-group .btn {
+    color: #777777;
+    background-color: #ffffff;
+    border: 1px solid #dcdcdc;
+    display: inline-block;
+    vertical-align: middle;
+    text-decoration: none;
+    cursor: pointer;
 }
 
 .fm-container .fm-header .buttons-panel {
@@ -97,69 +113,71 @@ html[data-useragent*='MSIE 11.0'] .fm-container #newfile {
     padding: 0;
 }
 
-.fm-container .fm-header .button-group button {
-    cursor: pointer;
-    padding: 2px 3px;
+.fm-container .fm-header .button-group .btn {
     margin: 0 1px;
 }
 
-.fm-container .fm-header .button-group button.separator {
+.fm-container .fm-preview .button-group .btn {
+    padding: 0.1em 0.3em;
+    margin: 0 0.2em 0.5em 0.2em;
+    line-height: 1.7em;
+}
+
+.fm-container .button-group .btn.active {
+    background-color: #C3D2F7;
+    border-color: #aac2ff;
+}
+
+.fm-container .button-group .btn.disabled {
+    background-color: #c5c5c5;
+}
+
+.fm-container .button-group .separator {
     width: 2px;
-    padding-left: 0;
-    padding-right: 0;
     margin: 1px 5px 0;
+    padding: 3px 1px;
     border: none;
     cursor: default;
 }
 
-.fm-container button {
-    display: inline-block;
-    color: #777777;
-    background-color: #ffffff;
-    border: 1px solid #dcdcdc;
-    padding: 0.1em 0.3em;
-    text-decoration: none;
-    margin: 0 0.2em 0.5em 0.2em;
-    line-height: 1.7em;
-    cursor: pointer;
-}
-
-.fm-container button:hover {
-    background-color: #ffffff;
-}
-
-.fm-container .fm-header button span,
-.fm-container .fm-fileinfo button span {
+.fm-container .button-group .btn span {
     display: block;
     padding-left: 20px;
+    line-height: 17px;
     background-position: left center;
     background-repeat: no-repeat;
     background-color: transparent;
     white-space: nowrap;
 }
 
-.fm-container button:active,
-.fm-container button:focus {
+.fm-container .button-group .btn:not(.disabled):hover {
+    background-color: #ffffff;
+}
+
+.fm-container .button-group .btn:active,
+.fm-container .button-group .btn:focus {
     color:#000;
     outline-color: transparent;
     outline-style: none;
     outline-width: 0;
 }
 
-.fm-container .fm-header button.no-label span {
+.fm-container .button-group .btn.no-label span {
     background-position: center center;
 }
 
-.fm-container .fm-header button.active {
-    background: none repeat scroll 0 0 #F9F8F7;
-    border-style: inset;
+.fm-container .fm-header select.lang-selector {
+    width: 45px;
 }
 
-.fm-container .fm-header .btn-home-folder span {
-    background-image: url(../images/house.png);
+.fm-container .fm-header .btn-nav-home span {
+    background-image: url(../images/nav/grey/home.png);
 }
-.fm-container .fm-header .btn-level-up span {
-    background-image: url(../images/level-up.png);
+.fm-container .fm-header .btn-nav-level-up span {
+    background-image: url(../images/nav/grey/level-up.png);
+}
+.fm-container .fm-header .btn-nav-refresh span {
+    background-image: url(../images/nav/grey/refresh.png);
 }
 .fm-container .fm-header .btn-grid-mode span {
     background-image: url(../images/application_view_icons.png);
@@ -184,6 +202,27 @@ html[data-useragent*='MSIE 11.0'] .fm-container #newfile {
 }
 .fm-container .fm-header .btn-clipboard-clear span {
     background-image: url(../images/clipboard/clipboard_clear.png);
+}
+.fm-container .fm-header .btn-filter-audio span {
+    background-image: url(../images/filter/grey/file-audio.png);
+}
+.fm-container .fm-header .btn-filter-archive span {
+    background-image: url(../images/filter/grey/file-archive.png);
+}
+.fm-container .fm-header .btn-filter-office span {
+    background-image: url(../images/filter/grey/file-office.png);
+}
+.fm-container .fm-header .btn-filter-image span {
+    background-image: url(../images/filter/grey/file-image.png);
+}
+.fm-container .fm-header .btn-filter-media span {
+    background-image: url(../images/filter/grey/file-media.png);
+}
+.fm-container .fm-header .btn-filter-reset span {
+    background-image: url(../images/filter/grey/file-all.png);
+}
+.fm-container .fm-header .btn-filter-video span {
+    background-image: url(../images/filter/grey/file-video.png);
 }
 .fm-container .fm-header .fm-upload span {
     background-image: url(../images/upload.png);
@@ -524,77 +563,6 @@ html[data-useragent*='MSIE 11.0'] .fm-container #newfile {
     background: url(../images/copy.png) no-repeat center center;
 }
 
-
-/** Input file Replacement */
-
-.fm-container input,
-.fm-container button {
-    vertical-align: text-top;
-}
-
-.fm-container #file-input-container {
-    display: inline;
-    margin: 0;
-    position: relative;
-    top: 0;
-    width: 255px;
-    height: 32px;
-    overflow: hidden;
-}
-
-.fm-container #newfile {
-    position: absolute;
-    top: 0;
-    right: 0;
-    height: 28px;
-    width: 100%;
-    opacity: 0;
-    filter: alpha(opacity=0);
-    cursor: pointer;
-    border: 1px solid blue;
-}
-
-.fm-container .hidden-file-input {
-    display: inline-block;
-    overflow: hidden;
-    visibility: hidden;
-    width: 1px;
-    z-index:-1;
-}
-
-.fm-container #alt-fileinput {
-    display: inline;
-}
-
-.fm-container #filepath {
-    margin: 0;
-    padding: 0 5px;
-    line-height: 26px;
-    background-color: #F4F1ED;
-    border: 1px solid #dcdcdc;
-}
-
-.fm-container button#browse {
-    margin-left:0;
-    -webkit-border-top-left-radius: 0;
-    -webkit-border-bottom-left-radius: 0;
-    -moz-border-radius-topleft: 0;
-    -moz-border-radius-bottomleft: 0;
-    border-top-left-radius: 0;
-    border-bottom-left-radius: 0;
-    min-height: 16px;
-    min-width: 40px;
-}
-.fm-container button#browse span {
-    margin:0;
-    padding:0;
-    background: url(../images/plus.png) no-repeat center center;
-    display: block;
-    color:#666;
-    text-shadow: none;
-}
-/** Input file Replacement - end */
-
 .fm-container .fm-footer .right {
     float: right;
 }
@@ -630,31 +598,64 @@ html[data-useragent*='MSIE 11.0'] .fm-container #newfile {
 }
 
 .fm-container .search-box {
-    position: absolute;
+    width: 200px;
+    height: 24px;
+    margin-top: 10px;
 }
 
 .fm-container .search-box input {
-    background-color: #ffffff;
-    border: 1px solid #dcdcdc;
-    margin: 0.5em 0 0;
-    padding: 0.1em 0.3em;
-    line-height: 1.7em;
-    width: 200px;
+    height: 100%;
 }
 
-.fm-container .search-box input:focus {
-    background-color: #ffffff;
-}
-
-.fm-container .search-box .search-box-reset {
-    position: absolute;
+.fm-container .search-box .icon {
+    display: block;
     width: 16px;
     height: 16px;
-    background: url(../images/reset_dark.png) no-repeat center center;
-    opacity: 0.5;
-    right: 6px;
-    top: 12px;
-    cursor: pointer;
+    background-repeat: no-repeat;
+    background-position: center;
+}
+
+.fm-container .search-box .search-icon {
+    background-image: url(../images/search_dark.png);
+}
+
+.fm-container .search-box .reset-icon {
+    background-image: url(../images/reset_dark.png);
+}
+
+.fm-container .input-group {
+    position: relative;
+    display: table;
+    border-collapse: separate;
+}
+
+.fm-container .input-group .input-group-input {
+    display: table-cell;
+    padding: 4px 8px;
+    width: 100%;
+    border: none;
+}
+
+.fm-container .input-group .input-group-addon {
+    display: table-cell;
+    padding: 4px 4px;
+    font-weight: 400;
+    text-align: center;
+    border-radius: 4px;
+    border: none;
+    width: 1%;
+    white-space: nowrap;
+    vertical-align: middle;
+}
+
+.fm-container .input-group .input-group-addon:first-child {
+    border-top-right-radius: 0;
+    border-bottom-right-radius: 0;
+}
+
+.fm-container .input-group .input-group-addon:last-child {
+    border-top-left-radius: 0;
+    border-bottom-left-radius: 0;
 }
 
 .fm-container .fm-splitter .mCSB_container_wrapper {
@@ -869,6 +870,9 @@ html[data-useragent*='MSIE 11.0'] .fm-container #newfile {
 .fm-container .context-menu-item.create-folder:before {
     background-image: url(../images/folder_add.png);
 }
+.fm-container .context-menu-item.copy-url:before {
+    background-image: url(../images/copy_url.png);
+}
 .fm-container .context-menu-item.cut:before {
     background-image: url(../images/clipboard/clipboard_cut.png);
 }
@@ -987,9 +991,102 @@ html[data-useragent*='MSIE 11.0'] .fm-container #newfile {
 }
 
 .fm-log.alertify-logs {
-    position: absolute;
     font-size: 13px;
     line-height: 13px;
+}
+
+.fm-log.alertify-logs.left {
+    left: 20px;
+}
+.fm-log.alertify-logs.right {
+    right: 35px;
+}
+.fm-log.alertify-logs.top {
+    top: 50px;
+}
+.fm-log.alertify-logs.bottom {
+    bottom: 50px;
+}
+
+.fm-log.alertify-logs .progress {
+    padding-top: 1px;
+    text-align: center;
+}
+
+.fm-log.alertify-logs .progress .progress-counter {
+    position: absolute;
+    display: inline-block;
+    left: 0;
+    right: 0;
+}
+
+.fm-log.alertify-logs .progress .progress-bar {
+    opacity: 1;
+    display: block;
+    height: 12px;
+    overflow: hidden;
+    border-radius: 4px;
+    -webkit-box-shadow: 0 0 1px 1px rgba(0, 0, 0, 0.25), inset 0 1px rgba(255, 255, 255, 0.1);
+    box-shadow: 0 0 1px 1px rgba(0, 0, 0, 0.25), inset 0 1px rgba(255, 255, 255, 0.1);
+}
+
+.fm-log.alertify-logs .progress .progress-segment {
+    height: 100%;
+    float: left;
+}
+
+.fm-log.alertify-logs .progress .progress-segment {
+    height: 100%;
+    float: left;
+}
+
+.fm-log.alertify-logs .progress .progress-segment.progress-succeed {
+    background-color: #5ab01e;
+}
+
+.fm-log.alertify-logs .progress .progress-segment.progress-failure {
+    background-color: #d50700;
+}
+
+.fm-log.alertify-logs .progress .progress-bar.striped .progress-segment {
+    background-image: -webkit-linear-gradient(45deg, rgba(255, 255, 255, 0.15) 25%, transparent 25%, transparent 50%, rgba(255, 255, 255, 0.15) 50%, rgba(255, 255, 255, 0.15) 75%, transparent 75%, transparent);
+    background-image: -o-linear-gradient(45deg, rgba(255, 255, 255, 0.15) 25%, transparent 25%, transparent 50%, rgba(255, 255, 255, 0.15) 50%, rgba(255, 255, 255, 0.15) 75%, transparent 75%, transparent);
+    background-image: linear-gradient(45deg, rgba(255, 255, 255, 0.15) 25%, transparent 25%, transparent 50%, rgba(255, 255, 255, 0.15) 50%, rgba(255, 255, 255, 0.15) 75%, transparent 75%, transparent);
+    -webkit-background-size: 2rem 2rem;
+    background-size: 2rem 2rem;
+}
+
+.fm-log.alertify-logs .progress .progress-bar.animated .progress-segment {
+    -webkit-animation: progress-bar-motion 2s linear infinite;
+    -o-animation: progress-bar-motion 2s linear infinite;
+    animation: progress-bar-motion 2s linear infinite;
+}
+
+@-webkit-keyframes progress-bar-motion {
+    from {
+        background-position: 0 2rem;
+    }
+    to {
+        background-position: 0 0;
+    }
+}
+
+@-o-keyframes progress-bar-motion {
+    from {
+        background-position: 0 2rem;
+    }
+    to {
+        background-position: 0 0;
+    }
+}
+
+@keyframes progress-bar-motion {
+    from {
+        background-position: 0 2rem;
+    }
+    to {
+        background-position: 0 0;
+    }
 }
 
 .fm-popup.alertify .alert,
