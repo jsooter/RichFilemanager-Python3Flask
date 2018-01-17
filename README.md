@@ -23,6 +23,8 @@ If you already have a FLask application setup you will not need FlaskApp.py, jus
 
 For security reasons it is recommended you replace static/RichFilemanager/index.html with an empty index.html if you don't intend to use it. Also you should implement your own user authentication/ authorization system. Authentication and authorization in Flask is well documented and beyond the scope of this documentation.
 
+**It is up to you to manage file system access on your server.** The application should be running with limited file system access.  **DO NOT** run as root or with sudo!
+
 ### Installation ###
 ```bash
 source flaskfilemanagerenv/bin/activate
@@ -30,3 +32,11 @@ export FLASK_APP=FlaskApp.py
 python3 -m flask run
 Open your browser and go to http://localhost:5000/files/filemanager
 ```
+
+### Other Considerations ###
+
+#### Werkzeug Development Server ####
+Consider using Flask with a production web server.
+From the [Werkzeug](http://werkzeug.pocoo.org/docs/0.14/serving/) site:
+> The development server is not intended to be used on production systems. It was designed especially for development purposes and performs poorly under high load. For deployment setups have a look at the [Application Deployment](http://werkzeug.pocoo.org/docs/0.14/deployment/#deployment) pages.
+
