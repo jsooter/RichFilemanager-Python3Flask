@@ -166,15 +166,15 @@ class FileManager:
     def copy(self):
         ''' Copies file or folder to specified directory. '''
         # Relative path of the source file/folder to move. e.g. "/images/logo.png"
-        old      = request.args.get('old').lstrip("/")
+        old      = request.args.get('source').lstrip("/")
         parts    = old.split('/')
         filename = parts.pop()
         path     = '/'.join(parts)
         old_path = os.path.join(self.root,old)
         # New relative path for the file/folder after the move. e.g. "/images/target/"
-        new      = request.args.get('new').lstrip("/")
+        new      = request.args.get('target').lstrip("/")
         new_path = os.path.join(self.root,new,filename)
-        if (self.is_safe_path(new_path)):
+        if (self.is_safe_path(new_path) and self.is_safe_path(old_path)):
            shutil.copyfile(old_path, new_path)
            response = FileManagerResponse(new_path)
            response.set_response()
