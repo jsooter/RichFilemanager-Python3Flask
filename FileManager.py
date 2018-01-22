@@ -180,22 +180,6 @@ class FileManager:
         else:
            return self.fileManagerError()
 #===============================================================================
-    def editfile(self):
-        ''' Edit a specific file contents online (extensions are specified in configuration file).
-        Note the "content" attribute in the response, which contains requested file contents.
-        All special characters in the file contents should be converted to HTML entities. '''
-        file        = request.args.get('path').lstrip("/")
-        path        = os.path.join(self.root,file)
-        if (self.is_safe_path(path)):
-           with open(path, "r") as fh:
-               content = fh.read()
-           response    = FileManagerResponse(path)
-           response.set_content(content)
-           response.set_response()
-           return jsonify(response.response)
-        else:
-           return self.fileManagerError()
-#===============================================================================
     def savefile(self):
         ''' Overwrites the content of the specific file to the "content" request parameter value. '''
         file    = request.form.get('path').lstrip("/")
