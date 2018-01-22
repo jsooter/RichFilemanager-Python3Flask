@@ -49,13 +49,11 @@ class FileManager:
         response['data']                = data
         return jsonify(response)
 #===============================================================================
-    def readfile(self):
+    def getinfo(self):
         ''' Provides data for a single file. '''
         file        = request.args.get('path').lstrip("/")
         path        = os.path.join(self.root,file)
         if (self.is_safe_path(path)):
-           with open(path, "r") as fh:
-               content = fh.read()
            response    = FileManagerResponse(path)
            response.set_response()
            return jsonify(response.response)
