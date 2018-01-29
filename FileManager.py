@@ -49,13 +49,11 @@ class FileManager:
         response['data']                = data
         return jsonify(response)
 #===============================================================================
-    def readfile(self):
+    def getinfo(self):
         ''' Provides data for a single file. '''
         file        = request.args.get('path').lstrip("/")
         path        = os.path.join(self.root,file)
         if (self.is_safe_path(path)):
-           with open(path, "r") as fh:
-               content = fh.read()
            response    = FileManagerResponse(path)
            response.set_response()
            return jsonify(response.response)
@@ -177,22 +175,6 @@ class FileManager:
         if (self.is_safe_path(new_path) and self.is_safe_path(old_path)):
            shutil.copyfile(old_path, new_path)
            response = FileManagerResponse(new_path)
-           response.set_response()
-           return jsonify(response.response)
-        else:
-           return self.fileManagerError()
-#===============================================================================
-    def editfile(self):
-        ''' Edit a specific file contents online (extensions are specified in configuration file).
-        Note the "content" attribute in the response, which contains requested file contents.
-        All special characters in the file contents should be converted to HTML entities. '''
-        file        = request.args.get('path').lstrip("/")
-        path        = os.path.join(self.root,file)
-        if (self.is_safe_path(path)):
-           with open(path, "r") as fh:
-               content = fh.read()
-           response    = FileManagerResponse(path)
-           response.set_content(content)
            response.set_response()
            return jsonify(response.response)
         else:
