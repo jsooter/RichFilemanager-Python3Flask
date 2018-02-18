@@ -14,8 +14,8 @@ from .FileManagerResponse import *
 class FileManager:
     # Path to your files root
     root = os.path.join(os.path.dirname(os.path.abspath(__file__)),'files')
-    def fileManagerError(self,title='FORBIDDEN_CHAR_SLASH'):
-       return self.error(title)
+    def fileManagerError(self,title='FORBIDDEN_CHAR_SLASH',path='/'):
+       return self.error(title,path)
     def is_safe_path(self,path, follow_symlinks=True):
        basedir = self.root
        # resolves symbolic links
@@ -58,7 +58,7 @@ class FileManager:
            response.set_response()
            return jsonify(response.response)
         else:
-           return self.fileManagerError()
+           return self.fileManagerError(path=path)
 #===============================================================================
     def readfolder(self):
         ''' Provides list of file and folder objects contained in a given directory. '''
@@ -75,7 +75,7 @@ class FileManager:
            results['data'] = data
            return jsonify(results)
         else:
-           return self.fileManagerError()
+           return self.fileManagerError(path=folder)
 #===============================================================================
     def addfolder(self):
         ''' Creates a new directory on the server within the given path. '''
@@ -89,7 +89,7 @@ class FileManager:
            response.set_response()
            return jsonify(response.response)
         else:
-           return self.fileManagerError()
+           return self.fileManagerError(path=path)
 #===============================================================================
     def upload(self):
         ''' Uploads a new file to the given folder.
@@ -109,9 +109,9 @@ class FileManager:
                    response.set_response()
                    return jsonify(response.response)
                 else:
-                   return self.fileManagerError()
+                   return self.fileManagerError(path=filename)
         # if upload failed return error
-        return self.fileManagerError()
+        return self.fileManagerError(path=path)
 #===============================================================================
     def rename(self):
         ''' Renames an existed file or folder. '''
@@ -136,7 +136,7 @@ class FileManager:
            response.set_response()
            return jsonify(response.response)
         else:
-           return self.fileManagerError()
+           return self.fileManagerError(path=new_path)
 #===============================================================================
     def move(self):
         ''' Moves file or folder to specified directory. '''
@@ -159,7 +159,7 @@ class FileManager:
            response.set_response()
            return jsonify(response.response)
         else:
-           return self.fileManagerError()
+           return self.fileManagerError(path=new)
 #===============================================================================
     def copy(self):
         ''' Copies file or folder to specified directory. '''
@@ -178,7 +178,7 @@ class FileManager:
            response.set_response()
            return jsonify(response.response)
         else:
-           return self.fileManagerError()
+           return self.fileManagerError(path=new)
 #===============================================================================
     def savefile(self):
         ''' Overwrites the content of the specific file to the "content" request parameter value. '''
@@ -193,7 +193,7 @@ class FileManager:
            response.set_response()
            return jsonify(response.response)
         else:
-           return self.fileManagerError()
+           return self.fileManagerError(path=file)
 #===============================================================================
     def delete(self):
         ''' Deletes an existed file or folder. '''
@@ -208,7 +208,7 @@ class FileManager:
                os.remove(path)
            return jsonify(response.response)
         else:
-           return self.fileManagerError()
+           return self.fileManagerError(path=file)
 #===============================================================================
     def download(self):
         ''' Downloads requested file or folder.
@@ -236,7 +236,7 @@ class FileManager:
                          attachment_filename=filename,
                          as_attachment=True)
            else:
-              return self.fileManagerError()
+              return self.fileManagerError(path=file)
 #===============================================================================
     def getimage(self):
         ''' Outputs the content of image file to browser. '''
@@ -246,7 +246,7 @@ class FileManager:
         if (self.is_safe_path(path)):
            return send_file(path, mimetype=mime_type)
         else:
-           return self.fileManagerError()
+           return self.fileManagerError(path=file)
 #===============================================================================
     def readfile(self):
         ''' Outputs the content of requested file to browser. Intended to read
@@ -263,15 +263,45 @@ class FileManager:
                      attachment_filename=filename,
                      as_attachment=True)
         else:
-           return self.fileManagerError()
+           return self.fileManagerError(path=file)
 #===============================================================================
+    def directory_size(self,path):
+        total_size = 0
+        total_files = 0
+        total_dirs = 0
+        seen = set()
+
+        for dirpath, dirnames, filenames in os.walk(path):
+            for f in filenames:
+                fp = os.path.join(dirpath, f)
+
+                try:
+                    stat = os.stat(fp)
+                except OSError:
+                    continue
+
+                if stat.st_ino in seen:
+                    continue
+
+                seen.add(stat.st_ino)
+                
+
+                total_size += stat.st_size
+                total_files+= 1
+            for d in dirnames:
+                total_dirs+= 1
+
+        return total_size,total_files,total_dirs  # size in bytes
+
     def summarize(self):
         ''' Display user storage folder summarize info. '''
         statinfo                = os.stat(self.root)
         attributes              = {}
-        attributes['size']      = statinfo.st_size
-        attributes['files']     = len([name for name in os.listdir(self.root) if os.path.isfile(name)])
-        attributes['folders']   = len([name for name in os.listdir(self.root) if os.path.isdir(name)])
+        total_size,total_files,total_dirs = self.directory_size(self.root)
+        print(total_size,total_files,total_dirs)
+        attributes['size']      = total_size
+        attributes['files']     = total_files
+        attributes['folders']   = total_dirs
         attributes['sizeLimit'] = 0
         data                    = {}
         data['id']              = '/'
@@ -303,16 +333,20 @@ class FileManager:
            results['data'] = data
            return jsonify(results)
         else:
-           return self.fileManagerError()
+           return self.fileManagerError(path=target_path)
 #===============================================================================
-    def error(self,title='Server Error. Unexpected Mode.'):
+    def error(self,title='Server Error. Unexpected Mode.',path="/"):
         '''  '''
         result           = {}
         errors           = []
         error            = {}
+        meta             = {}
         error['id']      = 'server'
         error['code']    = '500'
         error['title']   = title
+        meta['arguments'] = []
+        meta['arguments'].append(path)
+        error['meta']   = meta
         errors.append(error)
         result['errors'] = errors
         return jsonify(result)
