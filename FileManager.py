@@ -7,7 +7,7 @@ import datetime
 import glob
 from mimetypes import MimeTypes
 from zipfile import ZipFile
-from flask import request, jsonify, send_file
+from flask import request, jsonify, send_file, Response
 from werkzeug.utils import secure_filename
 from .FileManagerResponse import *
 from flask import current_app as app
@@ -128,7 +128,7 @@ class FileManager:
            else:
                return self.fileManagerError(path=os.path.join("/",path,name),title="DIRECTORY_ALREADY_EXISTS")
         else:
-           return self.fileManagerError(path=os.path.join("/",path,name),title="DIRECTORY_ALREADY_EXISTS")
+           return self.fileManagerError(path=os.path.join("/",path,name),title="NOT_ALLOWED")
 #===============================================================================
     def upload(self):
         ''' Uploads a new file to the given folder.
@@ -414,7 +414,10 @@ class FileManager:
         error['meta']   = meta
         errors.append(error)
         result['errors'] = errors
-        return jsonify(result)
+        response=jsonify(result)
+        response.status_code =  500
+        return response
+
 #===============================================================================
     def is_binary_file(self,filepathname):
         textchars = bytearray([7,8,9,10,12,13,27]) + bytearray(range(0x20, 0x7f)) + bytearray(range(0x80, 0x100))
