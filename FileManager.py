@@ -87,6 +87,17 @@ class FileManager:
         else:
            return self.fileManagerError(path=folder)
 #===============================================================================
+    def makeCaseInsensitiveGlobSearch(self,input):
+        upper = input.upper()
+        lower = input.lower()
+        newstr=''
+        for uc,lc in zip(upper,lower):
+           if uc!=lc:
+               newstr=newstr+'['+uc+lc+']'
+           else:
+               newstr=newstr+uc
+
+        return newstr
     def seekfolder(self):
         ''' Provides list of file and folder objects contained in a given directory. '''
         folder          = request.args.get('path').lstrip("/")
@@ -95,6 +106,7 @@ class FileManager:
         data            = []
         if (self.is_safe_path(folder_path)):
            try:
+               string=self.makeCaseInsensitiveGlobSearch(string)
                search=folder_path+'**/'+string+'*'
                #print(search)
                for file in glob.iglob(search, recursive=True):
@@ -110,7 +122,7 @@ class FileManager:
            except Exception as e:
                return self.fileManagerError(path=folder,title="NOT_ALLOWED")
         else:
-           return self.fileManagerError(path=folder)
+           return self.fileManagerError(path=folder,title="NOT_ALLOWED")
 #===============================================================================
     def addfolder(self):
         ''' Creates a new directory on the server within the given path. '''
@@ -128,7 +140,7 @@ class FileManager:
            else:
                return self.fileManagerError(path=os.path.join("/",path,name),title="DIRECTORY_ALREADY_EXISTS")
         else:
-           return self.fileManagerError(path=os.path.join("/",path,name),title="DIRECTORY_ALREADY_EXISTS")
+           return self.fileManagerError(path=os.path.join("/",path,name),title="NOT_ALLOWED")
 #===============================================================================
     def upload(self):
         ''' Uploads a new file to the given folder.
@@ -414,7 +426,10 @@ class FileManager:
         error['meta']   = meta
         errors.append(error)
         result['errors'] = errors
-        return jsonify(result)
+        response=jsonify(result)
+        response.status_code =  500
+        return response
+
 #===============================================================================
     def is_binary_file(self,filepathname):
         textchars = bytearray([7,8,9,10,12,13,27]) + bytearray(range(0x20, 0x7f)) + bytearray(range(0x80, 0x100))

@@ -35,6 +35,8 @@ class FileManagerResponse(object):
         ''' Build attributes dict for response '''
         attributes                  = {}
         attributes['name']          = self.relative_path.strip('/').split('/').pop()
+        attributes['readable']      = 1 if os.access(self.path, os.R_OK) else 0
+        attributes['writable']      = 1 if os.access(self.path, os.W_OK) else 0
         if self.type == 'file':
             attributes['extension'] = os.path.splitext(self.path)[1].lstrip('.')
             height                  = 0
@@ -45,11 +47,11 @@ class FileManagerResponse(object):
             attributes['height']    = height
             attributes['width']     = width
             attributes['size']      = os.path.getsize(self.path)
+        else:
+            if not os.access(self.path, os.X_OK):
+                attributes['readable'] = 0
+                attributes['writable'] = 0
         attributes['path']          = self.path
-        attributes['readable']      = 1 if os.access(self.path, os.R_OK) else 0
-        attributes['writable']      = 1 if os.access(self.path, os.W_OK) else 0
-        #attributes['created']       = datetime.datetime.fromtimestamp(self.statinfo.st_ctime).ctime()
-        #attributes['modified']      = datetime.datetime.fromtimestamp(self.statinfo.st_mtime).ctime()
         attributes['created']     = int(self.statinfo.st_ctime)
         attributes['modified']     = int(self.statinfo.st_mtime)
         attributes['timestamp']     = int(self.statinfo.st_mtime)
