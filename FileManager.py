@@ -1,6 +1,7 @@
 #!/usr/bin/python3
 import os
 import shutil
+import tempfile
 import mimetypes
 import datetime
 from mimetypes import MimeTypes
@@ -8,6 +9,8 @@ from zipfile import ZipFile
 from flask import request, jsonify, send_file
 from werkzeug.utils import secure_filename
 from .FileManagerResponse import *
+from flask import current_app as app
+
 
 
 
@@ -231,7 +234,30 @@ class FileManager:
             return jsonify(response.response)
         else:
            if (self.is_safe_path(path)):
-              return send_file(path,
+               
+               # check to see if this is a folder
+               if os.path.isdir(path):
+                   # grab the name of the folder to use
+                   filename = parts.pop()
+                   filename=os.path.basename(filename)+".zip"
+                   # make a temporary directory to store the zipfile in it
+                   dirpath = tempfile.mkdtemp()
+                   output_filename = os.path.join(dirpath,filename)
+                   shutil.make_archive(output_filename, 'zip', path)
+                   output_filename = output_filename+".zip"
+                   @app.after_request
+                   def remove_file(response):
+                       try:
+                           shutil.rmtree(dirpath)
+                       except Exception as error:
+                           app.logger.error("Error removing or closing downloaded file handle", error)
+                       return response
+                   return send_file(output_filename,
+                         mimetype=mimetype,
+                         attachment_filename=filename,
+                         as_attachment=True)
+               else:
+                   return send_file(path,
                          mimetype=mimetype,
                          attachment_filename=filename,
                          as_attachment=True)
