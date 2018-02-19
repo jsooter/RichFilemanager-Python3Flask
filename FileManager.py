@@ -250,7 +250,7 @@ class FileManager:
                        try:
                            shutil.rmtree(dirpath)
                        except Exception as error:
-                           app.logger.error("Error removing or closing downloaded file handle", error)
+                           print("Error removing or closing downloaded file handle", error)
                        return response
                    return send_file(output_filename,
                          mimetype=mimetype,
