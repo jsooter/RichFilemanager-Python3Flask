@@ -1,21 +1,25 @@
 #!/usr/bin/python3
 import os
 import shutil
+import tempfile
 import mimetypes
 import datetime
+import glob
 from mimetypes import MimeTypes
 from zipfile import ZipFile
 from flask import request, jsonify, send_file
 from werkzeug.utils import secure_filename
 from .FileManagerResponse import *
+from flask import current_app as app
+
 
 
 
 class FileManager:
     # Path to your files root
     root = os.path.join(os.path.dirname(os.path.abspath(__file__)),'files')
-    def fileManagerError(self,title='FORBIDDEN_CHAR_SLASH'):
-       return self.error(title)
+    def fileManagerError(self,title='FORBIDDEN_CHAR_SLASH',path='/'):
+       return self.error(title,path)
     def is_safe_path(self,path, follow_symlinks=True):
        basedir = self.root
        # resolves symbolic links
@@ -54,11 +58,14 @@ class FileManager:
         file        = request.args.get('path').lstrip("/")
         path        = os.path.join(self.root,file)
         if (self.is_safe_path(path)):
-           response    = FileManagerResponse(path)
-           response.set_response()
-           return jsonify(response.response)
+           try:
+               response    = FileManagerResponse(path)
+               response.set_response()
+               return jsonify(response.response)
+           except Exception as e:
+               return self.fileManagerError(path=path,title="NOT_ALLOWED")
         else:
-           return self.fileManagerError()
+           return self.fileManagerError(path=path)
 #===============================================================================
     def readfolder(self):
         ''' Provides list of file and folder objects contained in a given directory. '''
@@ -66,30 +73,62 @@ class FileManager:
         folder_path     = os.path.join(self.root,folder)
         data            = []
         if (self.is_safe_path(folder_path)):
-           for file in os.listdir(folder_path):
-               path        = os.path.join(folder_path,file)
-               response    = FileManagerResponse(path)
-               response.set_data()
-               data.append(response.data)
-           results         = {}
-           results['data'] = data
-           return jsonify(results)
+           try:
+               for file in os.listdir(folder_path):
+                   path        = os.path.join(folder_path,file)
+                   response    = FileManagerResponse(path)
+                   response.set_data()
+                   data.append(response.data)
+               results         = {}
+               results['data'] = data
+               return jsonify(results)
+           except Exception as e:
+               return self.fileManagerError(path=folder,title="NOT_ALLOWED")
         else:
-           return self.fileManagerError()
+           return self.fileManagerError(path=folder)
+#===============================================================================
+    def seekfolder(self):
+        ''' Provides list of file and folder objects contained in a given directory. '''
+        folder          = request.args.get('path').lstrip("/")
+        folder_path     = os.path.join(self.root,folder)
+        string = request.args.get('string')
+        data            = []
+        if (self.is_safe_path(folder_path)):
+           try:
+               search=folder_path+'**/'+string+'*'
+               #print(search)
+               for file in glob.iglob(search, recursive=True):
+               #     print(filename)
+               #for file in os.listdir(folder_path):
+                   path        = os.path.join(folder_path,file)
+                   response    = FileManagerResponse(path)
+                   response.set_data()
+                   data.append(response.data)
+               results         = {}
+               results['data'] = data
+               return jsonify(results)
+           except Exception as e:
+               return self.fileManagerError(path=folder,title="NOT_ALLOWED")
+        else:
+           return self.fileManagerError(path=folder)
 #===============================================================================
     def addfolder(self):
         ''' Creates a new directory on the server within the given path. '''
         path        = request.args.get('path').lstrip("/")
         name        = request.args.get('name')
+        print(path,name)
         folder_path = os.path.join(self.root,path,name)
-        if (self.is_safe_path(path)):
+        print(folder_path)
+        if (self.is_safe_path(folder_path)):
            if not os.path.exists(folder_path):
                os.makedirs(folder_path)
-           response    = FileManagerResponse(folder_path)
-           response.set_response()
-           return jsonify(response.response)
+               response    = FileManagerResponse(folder_path)
+               response.set_response()
+               return jsonify(response.response)
+           else:
+               return self.fileManagerError(path=os.path.join("/",path,name),title="DIRECTORY_ALREADY_EXISTS")
         else:
-           return self.fileManagerError()
+           return self.fileManagerError(path=os.path.join("/",path,name),title="DIRECTORY_ALREADY_EXISTS")
 #===============================================================================
     def upload(self):
         ''' Uploads a new file to the given folder.
@@ -109,9 +148,9 @@ class FileManager:
                    response.set_response()
                    return jsonify(response.response)
                 else:
-                   return self.fileManagerError()
+                   return self.fileManagerError(path=filename)
         # if upload failed return error
-        return self.fileManagerError()
+        return self.fileManagerError(path=path)
 #===============================================================================
     def rename(self):
         ''' Renames an existed file or folder. '''
@@ -136,7 +175,7 @@ class FileManager:
            response.set_response()
            return jsonify(response.response)
         else:
-           return self.fileManagerError()
+           return self.fileManagerError(path=new_path)
 #===============================================================================
     def move(self):
         ''' Moves file or folder to specified directory. '''
@@ -159,7 +198,7 @@ class FileManager:
            response.set_response()
            return jsonify(response.response)
         else:
-           return self.fileManagerError()
+           return self.fileManagerError(path=new)
 #===============================================================================
     def copy(self):
         ''' Copies file or folder to specified directory. '''
@@ -178,7 +217,7 @@ class FileManager:
            response.set_response()
            return jsonify(response.response)
         else:
-           return self.fileManagerError()
+           return self.fileManagerError(path=new)
 #===============================================================================
     def savefile(self):
         ''' Overwrites the content of the specific file to the "content" request parameter value. '''
@@ -193,7 +232,7 @@ class FileManager:
            response.set_response()
            return jsonify(response.response)
         else:
-           return self.fileManagerError()
+           return self.fileManagerError(path=file)
 #===============================================================================
     def delete(self):
         ''' Deletes an existed file or folder. '''
@@ -208,7 +247,7 @@ class FileManager:
                os.remove(path)
            return jsonify(response.response)
         else:
-           return self.fileManagerError()
+           return self.fileManagerError(path=file)
 #===============================================================================
     def download(self):
         ''' Downloads requested file or folder.
@@ -231,12 +270,38 @@ class FileManager:
             return jsonify(response.response)
         else:
            if (self.is_safe_path(path)):
-              return send_file(path,
+               
+               # check to see if this is a folder
+               if os.path.isdir(path):
+                   # grab the name of the folder to use
+                   filename = parts.pop()
+                   filename=os.path.basename(filename)+".zip"
+                   # make a temporary directory to store the zipfile in it
+                   dirpath = tempfile.mkdtemp()
+                   output_filename = os.path.join(dirpath,filename)
+                   shutil.make_archive(output_filename, 'zip', path)
+                   output_filename = output_filename+".zip"
+                   @app.after_request
+                   def remove_file(response):
+                       try:
+                          # I think remove_file gets called for everything
+                          if request.form.get('mode')=='download' and dirpath:
+                               shutil.rmtree(dirpath)
+                               dirpath=None
+                       except Exception as error:
+                          print("Error removing or closing downloaded file handle", error)
+                       return response
+                   return send_file(output_filename,
+                         mimetype=mimetype,
+                         attachment_filename=filename,
+                         as_attachment=True)
+               else:
+                   return send_file(path,
                          mimetype=mimetype,
                          attachment_filename=filename,
                          as_attachment=True)
            else:
-              return self.fileManagerError()
+              return self.fileManagerError(path=file)
 #===============================================================================
     def getimage(self):
         ''' Outputs the content of image file to browser. '''
@@ -246,7 +311,7 @@ class FileManager:
         if (self.is_safe_path(path)):
            return send_file(path, mimetype=mime_type)
         else:
-           return self.fileManagerError()
+           return self.fileManagerError(path=file)
 #===============================================================================
     def readfile(self):
         ''' Outputs the content of requested file to browser. Intended to read
@@ -263,15 +328,45 @@ class FileManager:
                      attachment_filename=filename,
                      as_attachment=True)
         else:
-           return self.fileManagerError()
+           return self.fileManagerError(path=file)
 #===============================================================================
+    def directory_size(self,path):
+        total_size = 0
+        total_files = 0
+        total_dirs = 0
+        seen = set()
+
+        for dirpath, dirnames, filenames in os.walk(path):
+            for f in filenames:
+                fp = os.path.join(dirpath, f)
+
+                try:
+                    stat = os.stat(fp)
+                except OSError:
+                    continue
+
+                if stat.st_ino in seen:
+                    continue
+
+                seen.add(stat.st_ino)
+                
+
+                total_size += stat.st_size
+                total_files+= 1
+            for d in dirnames:
+                total_dirs+= 1
+
+        return total_size,total_files,total_dirs  # size in bytes
+
     def summarize(self):
         ''' Display user storage folder summarize info. '''
         statinfo                = os.stat(self.root)
         attributes              = {}
-        attributes['size']      = statinfo.st_size
-        attributes['files']     = len([name for name in os.listdir(self.root) if os.path.isfile(name)])
-        attributes['folders']   = len([name for name in os.listdir(self.root) if os.path.isdir(name)])
+        total_size,total_files,total_dirs = self.directory_size(self.root)
+        print(total_size,total_files,total_dirs)
+        attributes['size']      = total_size
+        attributes['files']     = total_files
+        attributes['folders']   = total_dirs
         attributes['sizeLimit'] = 0
         data                    = {}
         data['id']              = '/'
@@ -303,16 +398,20 @@ class FileManager:
            results['data'] = data
            return jsonify(results)
         else:
-           return self.fileManagerError()
+           return self.fileManagerError(path=target_path)
 #===============================================================================
-    def error(self,title='Server Error. Unexpected Mode.'):
+    def error(self,title='Server Error. Unexpected Mode.',path="/"):
         '''  '''
         result           = {}
         errors           = []
         error            = {}
+        meta             = {}
         error['id']      = 'server'
         error['code']    = '500'
         error['title']   = title
+        meta['arguments'] = []
+        meta['arguments'].append(path)
+        error['meta']   = meta
         errors.append(error)
         result['errors'] = errors
         return jsonify(result)

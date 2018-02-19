@@ -27,7 +27,8 @@
             "replace",
             "delete",
             "extract",
-            "edit"
+            "edit",
+            "createFolder"
         ]
     },
     "filetree": {
@@ -169,6 +170,12 @@
     "extras": {
         "extra_js": [],
         "extra_js_async": true
+    },
+    "search": {
+        "enabled": true,
+        "recursive": true,
+        "caseSensitive": false,
+        "typingDelay": 500
     },
     "url": "https://github.com/servocoder/RichFilemanager",
     "version": "2.3.2"
