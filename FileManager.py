@@ -87,6 +87,17 @@ class FileManager:
         else:
            return self.fileManagerError(path=folder)
 #===============================================================================
+    def makeCaseInsensitiveGlobSearch(self,input):
+        upper = input.upper()
+        lower = input.lower()
+        newstr=''
+        for uc,lc in zip(upper,lower):
+           if uc!=lc:
+               newstr=newstr+'['+uc+lc+']'
+           else:
+               newstr=newstr+uc
+
+        return newstr
     def seekfolder(self):
         ''' Provides list of file and folder objects contained in a given directory. '''
         folder          = request.args.get('path').lstrip("/")
@@ -95,6 +106,7 @@ class FileManager:
         data            = []
         if (self.is_safe_path(folder_path)):
            try:
+               string=self.makeCaseInsensitiveGlobSearch(string)
                search=folder_path+'**/'+string+'*'
                #print(search)
                for file in glob.iglob(search, recursive=True):
@@ -110,7 +122,7 @@ class FileManager:
            except Exception as e:
                return self.fileManagerError(path=folder,title="NOT_ALLOWED")
         else:
-           return self.fileManagerError(path=folder)
+           return self.fileManagerError(path=folder,title="NOT_ALLOWED")
 #===============================================================================
     def addfolder(self):
         ''' Creates a new directory on the server within the given path. '''
