@@ -4,6 +4,7 @@ import shutil
 import tempfile
 import mimetypes
 import datetime
+import glob
 from mimetypes import MimeTypes
 from zipfile import ZipFile
 from flask import request, jsonify, send_file
@@ -57,9 +58,12 @@ class FileManager:
         file        = request.args.get('path').lstrip("/")
         path        = os.path.join(self.root,file)
         if (self.is_safe_path(path)):
-           response    = FileManagerResponse(path)
-           response.set_response()
-           return jsonify(response.response)
+           try:
+               response    = FileManagerResponse(path)
+               response.set_response()
+               return jsonify(response.response)
+           except Exception as e:
+               return self.fileManagerError(path=path,title="NOT_ALLOWED")
         else:
            return self.fileManagerError(path=path)
 #===============================================================================
@@ -69,14 +73,42 @@ class FileManager:
         folder_path     = os.path.join(self.root,folder)
         data            = []
         if (self.is_safe_path(folder_path)):
-           for file in os.listdir(folder_path):
-               path        = os.path.join(folder_path,file)
-               response    = FileManagerResponse(path)
-               response.set_data()
-               data.append(response.data)
-           results         = {}
-           results['data'] = data
-           return jsonify(results)
+           try:
+               for file in os.listdir(folder_path):
+                   path        = os.path.join(folder_path,file)
+                   response    = FileManagerResponse(path)
+                   response.set_data()
+                   data.append(response.data)
+               results         = {}
+               results['data'] = data
+               return jsonify(results)
+           except Exception as e:
+               return self.fileManagerError(path=folder,title="NOT_ALLOWED")
+        else:
+           return self.fileManagerError(path=folder)
+#===============================================================================
+    def seekfolder(self):
+        ''' Provides list of file and folder objects contained in a given directory. '''
+        folder          = request.args.get('path').lstrip("/")
+        folder_path     = os.path.join(self.root,folder)
+        string = request.args.get('string')
+        data            = []
+        if (self.is_safe_path(folder_path)):
+           try:
+               search=folder_path+'**/'+string+'*'
+               #print(search)
+               for file in glob.iglob(search, recursive=True):
+               #     print(filename)
+               #for file in os.listdir(folder_path):
+                   path        = os.path.join(folder_path,file)
+                   response    = FileManagerResponse(path)
+                   response.set_data()
+                   data.append(response.data)
+               results         = {}
+               results['data'] = data
+               return jsonify(results)
+           except Exception as e:
+               return self.fileManagerError(path=folder,title="NOT_ALLOWED")
         else:
            return self.fileManagerError(path=folder)
 #===============================================================================
@@ -248,9 +280,12 @@ class FileManager:
                    @app.after_request
                    def remove_file(response):
                        try:
-                           shutil.rmtree(dirpath)
+                          # I think remove_file gets called for everything
+                          if request.form.get('mode')=='download' and dirpath:
+                               shutil.rmtree(dirpath)
+                               dirpath=None
                        except Exception as error:
-                           print("Error removing or closing downloaded file handle", error)
+                          print("Error removing or closing downloaded file handle", error)
                        return response
                    return send_file(output_filename,
                          mimetype=mimetype,
