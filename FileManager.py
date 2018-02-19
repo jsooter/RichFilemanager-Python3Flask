@@ -116,15 +116,19 @@ class FileManager:
         ''' Creates a new directory on the server within the given path. '''
         path        = request.args.get('path').lstrip("/")
         name        = request.args.get('name')
+        print(path,name)
         folder_path = os.path.join(self.root,path,name)
-        if (self.is_safe_path(path)):
+        print(folder_path)
+        if (self.is_safe_path(folder_path)):
            if not os.path.exists(folder_path):
                os.makedirs(folder_path)
-           response    = FileManagerResponse(folder_path)
-           response.set_response()
-           return jsonify(response.response)
+               response    = FileManagerResponse(folder_path)
+               response.set_response()
+               return jsonify(response.response)
+           else:
+               return self.fileManagerError(path=os.path.join("/",path,name),title="DIRECTORY_ALREADY_EXISTS")
         else:
-           return self.fileManagerError(path=path)
+           return self.fileManagerError(path=os.path.join("/",path,name),title="DIRECTORY_ALREADY_EXISTS")
 #===============================================================================
     def upload(self):
         ''' Uploads a new file to the given folder.
