@@ -7,7 +7,7 @@ import datetime
 import glob
 from mimetypes import MimeTypes
 from zipfile import ZipFile
-from flask import request, jsonify, send_file, Response
+from flask import request, jsonify, send_file
 from werkzeug.utils import secure_filename
 from .FileManagerResponse import *
 from flask import current_app as app
